@@ -4,8 +4,24 @@ import pickle
 import pandas as pd
 import numpy as np
 import uvicorn
+import gdown
+import os
 
 app=FastAPI()
+
+similarity_url = 'https://drive.google.com/uc?export=download&id=1yqE-7lNvtBO7m0zuvO81Ec8PQpNnoj4c'
+movies_url = 'https://drive.google.com/uc?export=download&id=1zT4we4qZo-Kih3YuRtTZfK5_nElbfbqM'
+
+similarity_file = 'similarity.pkl'
+movies_file = 'movies.pkl'
+
+# Download files if they don't exist
+if not os.path.exists(similarity_file):
+    gdown.download(similarity_url, similarity_file, quiet=False)
+
+if not os.path.exists(movies_file):
+    gdown.download(movies_url, movies_file, quiet=False)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -15,8 +31,13 @@ app.add_middleware(
 
 movies=pd.read_pickle('movies.pkl')
 
+
 with open('similarity.pkl','rb') as f:
     similarity=pickle.load(f)
+
+
+
+print("Similarity matrix loaded successfully!")
 
 def get_recommendation(title):
     index=movies[movies['title'].str.contains(title, case=False, na=False)].index[0]
